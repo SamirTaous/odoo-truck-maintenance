@@ -19,6 +19,9 @@
         'data/sequence_data.xml',
         # 3. Views (UI)
         'views/truck_vehicle_views.xml',
+        'views/maintenance_request_views.xml',
+        'views/truck_dashboard_views.xml',
+        'views/actions.xml',
         'views/menus.xml',
     ],
     'demo': [
@@ -28,6 +31,8 @@
         'web.assets_backend': [
             # Stylesheet Files
             'truck_maintenance/static/src/css/truck_maintenance.css',
+            # JavaScript Files
+            'truck_maintenance/static/src/js/truck_ownership_tree.js',
         ],
     },
     'installable': True,

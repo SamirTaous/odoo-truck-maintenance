@@ -53,8 +53,6 @@
                             <field name="truck_type" required="1"/>
                             <field name="year" required="1"/>
                             <field name="vin_number" placeholder="Vehicle Identification Number"/>
-                            <field name="ownership_type" required="1"/>
-                            <field name="rental_status" readonly="1" attrs="{'invisible': [('ownership_type', '=', 'owned')]}"/>
                         </group>
                         <group string="Status &amp; Assignment">
                             <field name="active" widget="boolean_toggle"/>
@@ -62,6 +60,22 @@
                             <field name="maintenance_status"/>
                             <field name="driver_id" widget="many2one_avatar" placeholder="Select Driver"/>
                             <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <!-- Ownership Information - Prominent Section -->
+                    <group string="🏢 Ownership Information" class="ownership-section">
+                        <group>
+                            <field name="ownership_type" required="1" widget="radio" options="{'horizontal': true}"/>
+                            <field name="rental_status" readonly="1" attrs="{'invisible': [('ownership_type', '=', 'owned')]}"/>
+                        </group>
+                        <group attrs="{'invisible': [('ownership_type', '=', 'owned')]}">
+                            <div class="alert alert-info rental-info" attrs="{'invisible': [('ownership_type', '!=', 'rented')]}">
+                                <strong>Rental Truck:</strong> Please ensure rental dates and costs are properly configured.
+                            </div>
+                            <div class="alert alert-info rental-info" attrs="{'invisible': [('ownership_type', '!=', 'subcontracted')]}">
+                                <strong>Subcontracted Truck:</strong> Please specify the subcontractor company.
+                            </div>
                         </group>
                     </group>
 
@@ -185,9 +199,10 @@
                 <field name="max_payload"/>
                 <field name="cargo_volume"/>
                 <field name="maintenance_status"/>
+                <field name="rental_status"/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click tm-kanban-card">
+                        <div t-attf-class="oe_kanban_global_click tm-kanban-card truck-#{record.ownership_type.raw_value}">
                             <div class="o_kanban_image">
                                 <field name="image" widget="image" class="oe_avatar"/>
                                 <div class="o_kanban_image_fill_top" t-if="!record.is_available.raw_value" style="background-color: rgba(255,0,0,0.1);">
@@ -202,6 +217,16 @@
                                 <div class="text-muted"><field name="license_plate"/></div>
                                 <div class="text-muted small">
                                     <field name="brand"/> <field name="model_name"/>
+                                </div>
+                                
+                                <!-- Ownership Type Badge -->
+                                <div t-attf-class="ownership-badge #{record.ownership_type.raw_value}">
+                                    <i t-if="record.ownership_type.raw_value == 'owned'" t-attf-class="fa fa-building ownership-icon #{record.ownership_type.raw_value}"/>
+                                    <i t-if="record.ownership_type.raw_value == 'rented'" t-attf-class="fa fa-calendar ownership-icon #{record.ownership_type.raw_value}"/>
+                                    <i t-if="record.ownership_type.raw_value == 'subcontracted'" t-attf-class="fa fa-handshake-o ownership-icon #{record.ownership_type.raw_value}"/>
+                                    <span t-if="record.ownership_type.raw_value == 'owned'">Company Owned</span>
+                                    <span t-if="record.ownership_type.raw_value == 'rented'">Rented</span>
+                                    <span t-if="record.ownership_type.raw_value == 'subcontracted'">Subcontracted</span>
                                 </div>
                                 
                                 <hr class="mt-2 mb-2"/>
@@ -228,11 +253,10 @@
                                     <span t-if="record.maintenance_status.raw_value == 'critical'" class="text-danger">Critical</span>
                                 </div>
                                 
-                                <div class="tm_kanban_row">
-                                    <i class="fa fa-building-o"/>
-                                    <span t-if="record.ownership_type.raw_value == 'owned'">Company Owned</span>
-                                    <span t-if="record.ownership_type.raw_value == 'rented'" class="text-warning">Rented</span>
-                                    <span t-if="record.ownership_type.raw_value == 'subcontracted'" class="text-info">Subcontracted</span>
+                                <!-- Additional info for rented trucks -->
+                                <div t-if="record.ownership_type.raw_value == 'rented'" class="tm_kanban_row">
+                                    <i class="fa fa-info-circle"/>
+                                    <span class="small text-muted"><field name="rental_status"/></span>
                                 </div>
                                 
                                 <div t-if="record.driver_id.value">
@@ -254,20 +278,21 @@
         <field name="name">truck.vehicle.tree</field>
         <field name="model">truck.vehicle</field>
         <field name="arch" type="xml">
-            <tree decoration-muted="not active" decoration-warning="ownership_type == 'rented'" decoration-info="ownership_type == 'subcontracted'" decoration-danger="maintenance_status == 'critical'">
+            <tree decoration-muted="not active" decoration-danger="maintenance_status == 'critical'" js_class="truck_ownership_tree">
                 <field name="image" widget="image" class="oe_avatar"/>
                 <field name="name"/>
                 <field name="license_plate"/>
                 <field name="brand"/>
                 <field name="model_name"/>
                 <field name="truck_type"/>
-                <field name="ownership_type"/>
-                <field name="max_payload"/>
-                <field name="cargo_volume"/>
-                <field name="maintenance_status"/>
+                <field name="ownership_type" widget="badge" decoration-info="ownership_type == 'owned'" decoration-warning="ownership_type == 'rented'" decoration-success="ownership_type == 'subcontracted'"/>
+                <field name="max_payload" string="Payload (kg)"/>
+                <field name="cargo_volume" string="Volume (m³)"/>
+                <field name="maintenance_status" widget="badge" decoration-success="maintenance_status == 'good'" decoration-warning="maintenance_status == 'needs_attention'" decoration-danger="maintenance_status == 'critical'"/>
                 <field name="driver_id" widget="many2one_avatar"/>
-                <field name="is_available"/>
+                <field name="is_available" widget="boolean_toggle"/>
                 <field name="active" widget="boolean_toggle"/>
+                <field name="rental_status" optional="hide"/>
             </tree>
         </field>
     </record>
@@ -287,6 +312,57 @@
         </field>
     </record>
 
+    <!-- Company Owned Trucks -->
+    <record id="action_truck_vehicle_owned" model="ir.actions.act_window">
+        <field name="name">Company Trucks</field>
+        <field name="res_model">truck.vehicle</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('ownership_type', '=', 'owned')]</field>
+        <field name="context">{'default_ownership_type': 'owned'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No company-owned trucks yet!
+            </p>
+            <p>
+                Add your company-owned trucks to the fleet. These are trucks that your company owns outright.
+            </p>
+        </field>
+    </record>
+
+    <!-- Rented Trucks -->
+    <record id="action_truck_vehicle_rented" model="ir.actions.act_window">
+        <field name="name">Rented Trucks</field>
+        <field name="res_model">truck.vehicle</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('ownership_type', '=', 'rented')]</field>
+        <field name="context">{'default_ownership_type': 'rented'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No rented trucks yet!
+            </p>
+            <p>
+                Add rented trucks to track rental periods, costs, and maintenance responsibilities.
+            </p>
+        </field>
+    </record>
+
+    <!-- Subcontracted Trucks -->
+    <record id="action_truck_vehicle_subcontracted" model="ir.actions.act_window">
+        <field name="name">Subcontracted Trucks</field>
+        <field name="res_model">truck.vehicle</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('ownership_type', '=', 'subcontracted')]</field>
+        <field name="context">{'default_ownership_type': 'subcontracted'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No subcontracted trucks yet!
+            </p>
+            <p>
+                Add trucks from subcontractors to track their vehicles and maintenance status.
+            </p>
+        </field>
+    </record>
+
     <!-- Search View for better filtering -->
     <record id="view_truck_vehicle_search" model="ir.ui.view">
         <field name="name">truck.vehicle.search</field>
@@ -298,6 +374,7 @@
                 <field name="brand"/>
                 <field name="model_name"/>
                 <field name="driver_id"/>
+                <field name="subcontractor_id"/>
                 <separator/>
                 <filter string="Available" name="available" domain="[('is_available', '=', True)]"/>
                 <filter string="Not Available" name="not_available" domain="[('is_available', '=', False)]"/>
@@ -306,9 +383,12 @@
                 <filter string="Needs Attention" name="needs_attention" domain="[('maintenance_status', '=', 'needs_attention')]"/>
                 <filter string="Critical" name="critical" domain="[('maintenance_status', '=', 'critical')]"/>
                 <separator/>
-                <filter string="Company Owned" name="owned" domain="[('ownership_type', '=', 'owned')]"/>
-                <filter string="Rented" name="rented" domain="[('ownership_type', '=', 'rented')]"/>
-                <filter string="Subcontracted" name="subcontracted" domain="[('ownership_type', '=', 'subcontracted')]"/>
+                <filter string="🏢 Company Owned" name="owned" domain="[('ownership_type', '=', 'owned')]"/>
+                <filter string="📅 Rented Trucks" name="rented" domain="[('ownership_type', '=', 'rented')]"/>
+                <filter string="🤝 Subcontracted" name="subcontracted" domain="[('ownership_type', '=', 'subcontracted')]"/>
+                <separator/>
+                <filter string="Rental Expiring Soon" name="rental_expiring" domain="[('ownership_type', '=', 'rented'), ('rental_end_date', '&lt;=', (context_today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Active Rentals" name="active_rentals" domain="[('ownership_type', '=', 'rented'), ('rental_start_date', '&lt;=', context_today()), ('rental_end_date', '&gt;=', context_today())]"/>
                 <separator/>
                 <filter string="Rigid Trucks" name="rigid" domain="[('truck_type', '=', 'rigid')]"/>
                 <filter string="Articulated" name="articulated" domain="[('truck_type', '=', 'articulated')]"/>
@@ -319,11 +399,12 @@
                 <filter string="Active" name="active" domain="[('active', '=', True)]"/>
                 <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
                 <group expand="0" string="Group By">
+                    <filter string="Ownership Type" name="group_ownership" context="{'group_by': 'ownership_type'}"/>
                     <filter string="Brand" name="group_brand" context="{'group_by': 'brand'}"/>
                     <filter string="Truck Type" name="group_truck_type" context="{'group_by': 'truck_type'}"/>
-                    <filter string="Ownership Type" name="group_ownership" context="{'group_by': 'ownership_type'}"/>
                     <filter string="Maintenance Status" name="group_maintenance" context="{'group_by': 'maintenance_status'}"/>
                     <filter string="Driver" name="group_driver" context="{'group_by': 'driver_id'}"/>
+                    <filter string="Subcontractor" name="group_subcontractor" context="{'group_by': 'subcontractor_id'}"/>
                 </group>
             </search>
         </field>

@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_truck_vehicle,truck.vehicle access,model_truck_vehicle,base.group_user,1,1,1,1
+access_truck_maintenance_request,truck.maintenance.request access,model_truck_maintenance_request,base.group_user,1,1,1,1
+access_truck_maintenance_team,truck.maintenance.team access,model_truck_maintenance_team,base.group_user,1,1,1,1

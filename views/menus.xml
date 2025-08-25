@@ -12,13 +12,37 @@
         parent="menu_truck_maintenance_root"
         sequence="10"/>
 
-    <!-- Truck Fleet Menu -->
+    <!-- All Trucks Menu -->
     <menuitem
         id="menu_truck_vehicle"
-        name="Truck Fleet"
+        name="All Trucks"
         parent="menu_truck_fleet"
         action="action_truck_vehicle"
         sequence="10"/>
+
+    <!-- Company Trucks Menu -->
+    <menuitem
+        id="menu_truck_vehicle_owned"
+        name="🏢 Company Trucks"
+        parent="menu_truck_fleet"
+        action="action_truck_vehicle_owned"
+        sequence="20"/>
+
+    <!-- Rented Trucks Menu -->
+    <menuitem
+        id="menu_truck_vehicle_rented"
+        name="📅 Rented Trucks"
+        parent="menu_truck_fleet"
+        action="action_truck_vehicle_rented"
+        sequence="30"/>
+
+    <!-- Subcontracted Trucks Menu -->
+    <menuitem
+        id="menu_truck_vehicle_subcontracted"
+        name="🤝 Subcontracted Trucks"
+        parent="menu_truck_fleet"
+        action="action_truck_vehicle_subcontracted"
+        sequence="40"/>
 
     <!-- Maintenance Submenu -->
     <menuitem
@@ -32,8 +56,24 @@
         id="menu_maintenance_requests"
         name="Maintenance Requests"
         parent="menu_truck_maintenance"
-        action="maintenance.hr_equipment_request_action"
+        action="action_truck_maintenance_requests"
         sequence="10"/>
+
+    <!-- Maintenance Dashboard Menu -->
+    <menuitem
+        id="menu_maintenance_dashboard"
+        name="Dashboard"
+        parent="menu_truck_maintenance"
+        action="action_truck_maintenance_dashboard"
+        sequence="20"/>
+
+    <!-- Maintenance Teams Menu -->
+    <menuitem
+        id="menu_maintenance_teams"
+        name="Teams"
+        parent="menu_truck_maintenance"
+        action="action_truck_maintenance_teams"
+        sequence="30"/>
 
     <!-- Reports Submenu -->
     <menuitem

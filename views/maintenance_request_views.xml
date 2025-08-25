@@ -1,0 +1,223 @@
+<odoo>
+    <!-- Truck Maintenance Request Form View -->
+    <record id="view_truck_maintenance_request_form" model="ir.ui.view">
+        <field name="name">truck.maintenance.request.form</field>
+        <field name="model">truck.maintenance.request</field>
+        <field name="arch" type="xml">
+            <form string="Truck Maintenance Request">
+                <header>
+                    <button name="action_request" string="Request" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_start" string="Start Work" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'requested')]}"/>
+                    <button name="action_done" string="Mark Done" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'in_progress')]}"/>
+                    <button name="action_cancel" string="Cancel" type="object" attrs="{'invisible': [('state', 'in', ['done', 'cancelled'])]}"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,requested,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Maintenance Request Subject"/></h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Request Information">
+                            <field name="truck_id" required="1"/>
+                            <field name="maintenance_type" required="1"/>
+                            <field name="category"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="request_date"/>
+                        </group>
+                        <group string="Assignment">
+                            <field name="maintenance_team_id"/>
+                            <field name="technician_id"/>
+                            <field name="scheduled_date"/>
+                            <field name="completion_date" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Cost Estimation">
+                            <field name="estimated_cost"/>
+                            <field name="actual_cost"/>
+                            <field name="labor_hours"/>
+                        </group>
+                        <group string="Vehicle Information">
+                            <field name="odometer_reading"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="Describe the maintenance issue or work to be performed..."/>
+                        </page>
+                        <page string="Parts &amp; Work" name="parts_work">
+                            <group>
+                                <field name="parts_needed" placeholder="List parts needed for this maintenance..."/>
+                                <field name="work_performed" placeholder="Describe work performed..."/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Additional notes and comments..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Truck Maintenance Request Tree View -->
+    <record id="view_truck_maintenance_request_tree" model="ir.ui.view">
+        <field name="name">truck.maintenance.request.tree</field>
+        <field name="model">truck.maintenance.request</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'" decoration-warning="state == 'requested'" decoration-success="state == 'done'" decoration-danger="state == 'cancelled'">
+                <field name="name"/>
+                <field name="truck_id"/>
+                <field name="maintenance_type"/>
+                <field name="category"/>
+                <field name="priority" widget="priority"/>
+                <field name="request_date"/>
+                <field name="scheduled_date"/>
+                <field name="technician_id"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'requested'" decoration-success="state == 'done'" decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Truck Maintenance Request Kanban View -->
+    <record id="view_truck_maintenance_request_kanban" model="ir.ui.view">
+        <field name="name">truck.maintenance.request.kanban</field>
+        <field name="model">truck.maintenance.request</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="truck_id"/>
+                <field name="maintenance_type"/>
+                <field name="priority"/>
+                <field name="state"/>
+                <field name="technician_id"/>
+                <field name="scheduled_date"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_content">
+                                <div class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </div>
+                                <div class="o_kanban_record_subtitle">
+                                    <field name="truck_id"/>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="priority" widget="priority"/>
+                                        <field name="maintenance_type"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="technician_id" widget="many2one_avatar_user"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Truck Maintenance Request Calendar View -->
+    <record id="view_truck_maintenance_request_calendar" model="ir.ui.view">
+        <field name="name">truck.maintenance.request.calendar</field>
+        <field name="model">truck.maintenance.request</field>
+        <field name="arch" type="xml">
+            <calendar string="Maintenance Schedule" date_start="scheduled_date" color="priority" quick_add="False">
+                <field name="name"/>
+                <field name="truck_id"/>
+                <field name="maintenance_type"/>
+                <field name="technician_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Truck Maintenance Request Search View -->
+    <record id="view_truck_maintenance_request_search" model="ir.ui.view">
+        <field name="name">truck.maintenance.request.search</field>
+        <field name="model">truck.maintenance.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="truck_id"/>
+                <field name="technician_id"/>
+                <field name="maintenance_team_id"/>
+                <separator/>
+                <filter string="My Requests" name="my_requests" domain="[('technician_id', '=', uid)]"/>
+                <filter string="Open Requests" name="open_requests" domain="[('state', 'in', ['draft', 'requested', 'in_progress'])]"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Requested" name="requested" domain="[('state', '=', 'requested')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter string="High Priority" name="high_priority" domain="[('priority', 'in', ['3', '4'])]"/>
+                <filter string="Emergency" name="emergency" domain="[('maintenance_type', '=', 'emergency')]"/>
+                <separator/>
+                <filter string="This Week" name="this_week" domain="[('scheduled_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')), ('scheduled_date', '&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Truck" name="group_truck" context="{'group_by': 'truck_id'}"/>
+                    <filter string="Maintenance Type" name="group_type" context="{'group_by': 'maintenance_type'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Technician" name="group_technician" context="{'group_by': 'technician_id'}"/>
+                    <filter string="Team" name="group_team" context="{'group_by': 'maintenance_team_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Truck Maintenance Team Form View -->
+    <record id="view_truck_maintenance_team_form" model="ir.ui.view">
+        <field name="name">truck.maintenance.team.form</field>
+        <field name="model">truck.maintenance.team</field>
+        <field name="arch" type="xml">
+            <form string="Maintenance Team">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Team Name"/></h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="leader_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="color" widget="color"/>
+                        </group>
+                    </group>
+                    
+                    <field name="member_ids" widget="many2many_tags"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Truck Maintenance Team Tree View -->
+    <record id="view_truck_maintenance_team_tree" model="ir.ui.view">
+        <field name="name">truck.maintenance.team.tree</field>
+        <field name="model">truck.maintenance.team</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="leader_id"/>
+                <field name="member_ids" widget="many2many_tags"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

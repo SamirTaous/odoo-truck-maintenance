@@ -43,4 +43,7 @@
             'search_default_my_requests': 1,
         }</field>
     </record>
+
+
+
 </odoo>
