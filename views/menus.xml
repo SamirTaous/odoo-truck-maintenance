@@ -1,0 +1,45 @@
+<odoo>
+    <!-- Top Level Menu -->
+    <menuitem
+        id="menu_truck_maintenance_root"
+        name="Truck Maintenance"
+        sequence="30"/>
+
+    <!-- Fleet Management Submenu -->
+    <menuitem
+        id="menu_truck_fleet"
+        name="Fleet Management"
+        parent="menu_truck_maintenance_root"
+        sequence="10"/>
+
+    <!-- Truck Fleet Menu -->
+    <menuitem
+        id="menu_truck_vehicle"
+        name="Truck Fleet"
+        parent="menu_truck_fleet"
+        action="action_truck_vehicle"
+        sequence="10"/>
+
+    <!-- Maintenance Submenu -->
+    <menuitem
+        id="menu_truck_maintenance"
+        name="Maintenance"
+        parent="menu_truck_maintenance_root"
+        sequence="20"/>
+
+    <!-- Maintenance Requests Menu -->
+    <menuitem
+        id="menu_maintenance_requests"
+        name="Maintenance Requests"
+        parent="menu_truck_maintenance"
+        action="maintenance.hr_equipment_request_action"
+        sequence="10"/>
+
+    <!-- Reports Submenu -->
+    <menuitem
+        id="menu_truck_reports"
+        name="Reports"
+        parent="menu_truck_maintenance_root"
+        sequence="30"/>
+
+</odoo>

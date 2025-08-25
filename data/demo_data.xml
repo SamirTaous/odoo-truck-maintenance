@@ -1,0 +1,41 @@
+<odoo>
+    <data noupdate="1">
+        <!-- Demo Truck Vehicles -->
+        <record id="demo_truck_1" model="truck.vehicle">
+            <field name="name">TRK0001</field>
+            <field name="license_plate">ABC-123</field>
+            <field name="brand">volvo</field>
+            <field name="model_name">FH16</field>
+            <field name="year">2020</field>
+            <field name="truck_type">articulated</field>
+            <field name="ownership_type">owned</field>
+            <field name="max_payload">25000</field>
+            <field name="cargo_volume">90</field>
+            <field name="fuel_type">diesel</field>
+            <field name="engine_power">540</field>
+            <field name="has_gps">True</field>
+            <field name="maintenance_status">good</field>
+            <field name="odometer">125000</field>
+            <field name="service_interval_km">10000</field>
+        </record>
+
+        <record id="demo_truck_2" model="truck.vehicle">
+            <field name="name">TRK0002</field>
+            <field name="license_plate">XYZ-456</field>
+            <field name="brand">scania</field>
+            <field name="model_name">R450</field>
+            <field name="year">2019</field>
+            <field name="truck_type">rigid</field>
+            <field name="ownership_type">owned</field>
+            <field name="max_payload">18000</field>
+            <field name="cargo_volume">65</field>
+            <field name="fuel_type">diesel</field>
+            <field name="engine_power">450</field>
+            <field name="has_refrigeration">True</field>
+            <field name="has_gps">True</field>
+            <field name="maintenance_status">needs_attention</field>
+            <field name="odometer">98000</field>
+            <field name="service_interval_km">10000</field>
+        </record>
+    </data>
+</odoo>

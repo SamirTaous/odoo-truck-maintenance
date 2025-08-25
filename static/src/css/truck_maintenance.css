@@ -1,0 +1,40 @@
+/* Truck Maintenance Module Styles */
+
+.o_truck_maintenance .tm-kanban-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.o_truck_maintenance .tm-kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.o_truck_maintenance .tm_kanban_body {
+    padding: 12px;
+}
+
+.o_truck_maintenance .tm_kanban_row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.o_truck_maintenance .tm_kanban_row i {
+    width: 16px;
+    margin-right: 8px;
+    color: #6c757d;
+}
+
+.o_truck_maintenance .text-success {
+    color: #28a745 !important;
+}
+
+.o_truck_maintenance .text-warning {
+    color: #ffc107 !important;
+}
+
+.o_truck_maintenance .text-danger {
+    color: #dc3545 !important;
+}
