@@ -121,7 +121,7 @@ class TruckVehicle(models.Model):
     
     # Financial
     currency_id = fields.Many2one('res.currency', string='Currency', 
-                                 default=lambda self: self.env.company.currency_id)
+                                 default=lambda self: self._get_mad_currency())
     purchase_price = fields.Monetary(string='Purchase Price', currency_field='currency_id')
     current_value = fields.Monetary(string='Current Value', currency_field='currency_id')
     
@@ -276,6 +276,11 @@ class TruckVehicle(models.Model):
             }
         }
     
+    def _get_mad_currency(self):
+        """Get MAD currency or fallback to company currency"""
+        mad_currency = self.env['res.currency'].search([('name', '=', 'MAD')], limit=1)
+        return mad_currency if mad_currency else self.env.company.currency_id
+
     def action_update_odometer(self):
         """Action to update truck odometer"""
         return {
