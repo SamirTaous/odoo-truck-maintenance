@@ -1,0 +1,46 @@
+<odoo>
+    <!-- Truck Maintenance Requests Action -->
+    <record id="action_truck_maintenance_requests" model="ir.actions.act_window">
+        <field name="name">Truck Maintenance Requests</field>
+        <field name="res_model">truck.maintenance.request</field>
+        <field name="view_mode">kanban,tree,form,calendar</field>
+        <field name="context">{
+            'search_default_open_requests': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a truck maintenance request!
+            </p>
+            <p>
+                Schedule maintenance for your truck fleet. Track repairs, 
+                inspections, and preventive maintenance to keep your trucks running smoothly.
+            </p>
+        </field>
+    </record>
+
+    <!-- Truck Maintenance Teams Action -->
+    <record id="action_truck_maintenance_teams" model="ir.actions.act_window">
+        <field name="name">Maintenance Teams</field>
+        <field name="res_model">truck.maintenance.team</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create maintenance teams!
+            </p>
+            <p>
+                Organize your maintenance staff into teams to efficiently handle truck maintenance requests.
+            </p>
+        </field>
+    </record>
+
+    <!-- Truck Maintenance Dashboard Action -->
+    <record id="action_truck_maintenance_dashboard" model="ir.actions.act_window">
+        <field name="name">Maintenance Dashboard</field>
+        <field name="res_model">truck.maintenance.request</field>
+        <field name="view_mode">kanban,calendar</field>
+        <field name="domain">[('state', 'in', ['requested', 'in_progress'])]</field>
+        <field name="context">{
+            'search_default_my_requests': 1,
+        }</field>
+    </record>
+</odoo>
