@@ -94,32 +94,112 @@
         <field name="name">truck.maintenance.request.kanban</field>
         <field name="model">truck.maintenance.request</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="state" class="o_kanban_small_column">
+            <kanban default_group_by="state" class="o_truck_maintenance">
                 <field name="name"/>
                 <field name="truck_id"/>
                 <field name="maintenance_type"/>
+                <field name="category"/>
                 <field name="priority"/>
                 <field name="state"/>
                 <field name="technician_id"/>
+                <field name="maintenance_team_id"/>
                 <field name="scheduled_date"/>
+                <field name="request_date"/>
+                <field name="estimated_cost"/>
+                <field name="actual_cost"/>
+                <field name="labor_hours"/>
+                <field name="odometer_reading"/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <div class="o_kanban_content">
-                                <div class="o_kanban_record_title">
-                                    <field name="name"/>
+                        <div t-attf-class="oe_kanban_global_click tm-kanban-card maintenance-#{record.maintenance_type.raw_value} priority-#{record.priority.raw_value}">
+                            <div class="o_kanban_image">
+                                <div class="maintenance-avatar">
+                                    <i t-if="record.maintenance_type.raw_value == 'preventive'" class="fa fa-calendar-check-o"/>
+                                    <i t-if="record.maintenance_type.raw_value == 'corrective'" class="fa fa-wrench"/>
+                                    <i t-if="record.maintenance_type.raw_value == 'inspection'" class="fa fa-search"/>
+                                    <i t-if="record.maintenance_type.raw_value == 'emergency'" class="fa fa-exclamation-triangle"/>
                                 </div>
-                                <div class="o_kanban_record_subtitle">
-                                    <field name="truck_id"/>
+                                <div class="o_kanban_image_fill_top" t-if="record.priority.raw_value == '4'" style="background-color: rgba(220,53,69,0.1);">
+                                    <i class="fa fa-exclamation text-danger" title="Very High Priority"/>
                                 </div>
-                                <div class="o_kanban_record_bottom">
-                                    <div class="oe_kanban_bottom_left">
-                                        <field name="priority" widget="priority"/>
-                                        <field name="maintenance_type"/>
+                                <div class="o_kanban_image_fill_top" t-if="record.priority.raw_value == '3'" style="background-color: rgba(255,193,7,0.1);">
+                                    <i class="fa fa-exclamation text-warning" title="High Priority"/>
+                                </div>
+                                <div class="o_kanban_image_fill_top" t-if="record.maintenance_type.raw_value == 'emergency'" style="background-color: rgba(220,53,69,0.2);">
+                                    <i class="fa fa-bolt text-danger" title="Emergency"/>
+                                </div>
+                            </div>
+                            <div class="tm_kanban_body">
+                                <strong><field name="name"/></strong>
+                                <div class="text-muted"><field name="truck_id"/></div>
+                                
+                                <!-- Maintenance Type Badge -->
+                                <div t-attf-class="maintenance-type-badge #{record.maintenance_type.raw_value}">
+                                    <i t-if="record.maintenance_type.raw_value == 'preventive'" t-attf-class="fa fa-calendar-check-o maintenance-icon #{record.maintenance_type.raw_value}"/>
+                                    <i t-if="record.maintenance_type.raw_value == 'corrective'" t-attf-class="fa fa-wrench maintenance-icon #{record.maintenance_type.raw_value}"/>
+                                    <i t-if="record.maintenance_type.raw_value == 'inspection'" t-attf-class="fa fa-search maintenance-icon #{record.maintenance_type.raw_value}"/>
+                                    <i t-if="record.maintenance_type.raw_value == 'emergency'" t-attf-class="fa fa-exclamation-triangle maintenance-icon #{record.maintenance_type.raw_value}"/>
+                                    <span t-if="record.maintenance_type.raw_value == 'preventive'">Preventive</span>
+                                    <span t-if="record.maintenance_type.raw_value == 'corrective'">Corrective</span>
+                                    <span t-if="record.maintenance_type.raw_value == 'inspection'">Inspection</span>
+                                    <span t-if="record.maintenance_type.raw_value == 'emergency'">Emergency</span>
+                                </div>
+                                
+                                <hr class="mt-2 mb-2"/>
+                                
+                                <div class="tm_kanban_row" t-if="record.category.value">
+                                    <i class="fa fa-tag"/>
+                                    <span><field name="category"/></span>
+                                </div>
+                                
+                                <div class="tm_kanban_row">
+                                    <i class="fa fa-flag"/>
+                                    <span t-if="record.priority.raw_value == '0'" class="text-muted">Very Low</span>
+                                    <span t-if="record.priority.raw_value == '1'" class="text-info">Low</span>
+                                    <span t-if="record.priority.raw_value == '2'" class="text-primary">Normal</span>
+                                    <span t-if="record.priority.raw_value == '3'" class="text-warning">High</span>
+                                    <span t-if="record.priority.raw_value == '4'" class="text-danger">Very High</span>
+                                </div>
+                                
+                                <div class="tm_kanban_row" t-if="record.scheduled_date.value">
+                                    <i class="fa fa-clock-o"/>
+                                    <span><field name="scheduled_date" widget="date"/></span>
+                                </div>
+                                
+                                <div class="tm_kanban_row" t-if="record.estimated_cost.value">
+                                    <i class="fa fa-money"/>
+                                    <span><field name="estimated_cost"/> €</span>
+                                </div>
+                                
+                                <div class="tm_kanban_row" t-if="record.odometer_reading.value">
+                                    <i class="fa fa-tachometer"/>
+                                    <span><field name="odometer_reading"/> km</span>
+                                </div>
+                                
+                                <div class="tm_kanban_row" t-if="record.labor_hours.value">
+                                    <i class="fa fa-clock-o"/>
+                                    <span><field name="labor_hours"/> hours</span>
+                                </div>
+                                
+                                <!-- Team and Technician info -->
+                                <div t-if="record.technician_id.value or record.maintenance_team_id.value">
+                                    <hr class="mt-2 mb-2"/>
+                                    <div class="tm_kanban_row" t-if="record.maintenance_team_id.value">
+                                        <i class="fa fa-users"/>
+                                        <span><field name="maintenance_team_id"/></span>
                                     </div>
-                                    <div class="oe_kanban_bottom_right">
-                                        <field name="technician_id" widget="many2one_avatar_user"/>
+                                    <div class="tm_kanban_row" t-if="record.technician_id.value">
+                                        <i class="fa fa-user"/>
+                                        <span><field name="technician_id"/></span>
                                     </div>
+                                </div>
+                                
+                                <!-- Request date at bottom -->
+                                <div class="tm_kanban_footer">
+                                    <small class="text-muted">
+                                        <i class="fa fa-calendar"/>
+                                        Requested: <field name="request_date" widget="date"/>
+                                    </small>
                                 </div>
                             </div>
                         </div>
